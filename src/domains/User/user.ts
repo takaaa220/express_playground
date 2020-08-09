@@ -1,7 +1,18 @@
 import { UserRole } from "./role";
+import { Team } from "../Team/team";
+import { UserName } from "./name";
 
 export class User {
-  constructor(private _id: string, private _name: string, private _role: UserRole) {}
+  private _name: UserName;
+
+  constructor(
+    private _id: string,
+    name: string,
+    private _role: UserRole,
+    private _teamId: Team["id"] = "",
+  ) {
+    this._name = new UserName(name);
+  }
 
   get id() {
     return this._id;
@@ -12,6 +23,14 @@ export class User {
   }
 
   get name() {
-    return this._name;
+    return this._name.value;
+  }
+
+  get teamId() {
+    return this._teamId;
+  }
+
+  equals(target: User) {
+    return this.id === target.id;
   }
 }
