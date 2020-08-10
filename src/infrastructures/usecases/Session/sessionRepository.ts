@@ -7,7 +7,7 @@ export class SessionRepository implements ISessionRepository {
   async getId() {
     if (this.id) return this.id;
 
-    this.id = await Promise.resolve<string>("current");
+    this.id = await Promise.resolve<string>("b12ace8f-5225-4272-a2df-0843a9edff8b");
     return this.id;
   }
 }

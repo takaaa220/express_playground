@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: onion-test
+    ports:
+      - 28001:27017
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

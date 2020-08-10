@@ -2,50 +2,86 @@ import { Team } from "../../../domains/Team/team";
 import { ITeamRepository } from "../../../domains/Team/teamRepository";
 import { InfrastructureError } from "../../helpers/error";
 import { UserRepository } from "../User/userRepository";
+import { connectDb } from "../../database/mongodb";
+import { Db } from "mongodb";
+import { createTeamMapper, updateTeamMapper } from "./teamMapper";
+import { TeamDao } from "./teamDao";
 
-let teams: Team[] = [new Team("team1", "takaaa220 team", "current", ["current"])];
+type TeamDB = {
+  id: string;
+  name: string;
+  ownerId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export class TeamRepository implements ITeamRepository {
-  get(teamId: Team["id"]) {
-    return new Promise<Team>(async (resolve, reject) => {
-      const team = teams.find((t) => t.id === teamId);
-      if (!team) {
-        return reject(new InfrastructureError("Not Found"));
+  async get(teamId: Team["id"]) {
+    try {
+      const db = await connectDb();
+      const teamData = await this.collection(db).findOne({ id: teamId });
+
+      if (!teamData) {
+        throw new Error("チームが見つかりませんでした");
       }
 
-      const teamIds = await this.teamUserIds(teamId);
+      const userRepository = new UserRepository();
+      const users = await userRepository.getAllByTeamId(teamId);
+      const teamUserIds = users.map((u) => u.id);
 
-      resolve(new Team(team.id, team.name.value, team.ownerId, teamIds));
-    });
+      const dao = new TeamDao(
+        teamData.id,
+        teamData.name,
+        teamData.ownerId,
+        teamData.createdAt,
+        teamData.updatedAt,
+        teamUserIds,
+      );
+      return this.daoToTeam(dao);
+    } catch (e) {
+      console.error(e);
+      throw new InfrastructureError("エラーが発生しました");
+    }
   }
 
-  create(team: Team) {
-    return new Promise<Team>((resolve) => {
-      teams.push(team);
+  async create(team: Team) {
+    try {
+      const db = await connectDb();
+      await this.collection(db).insertOne(
+        createTeamMapper({
+          id: team.id,
+          name: team.name,
+          ownerId: team.ownerId,
+        }),
+      );
 
-      resolve(team);
-    });
+      return team;
+    } catch (e) {
+      console.error(e);
+      throw new InfrastructureError("チームの作成にしっぱいしました");
+    }
   }
 
-  update(team: Team) {
-    return new Promise<Team>(async (resolve, reject) => {
-      teams = teams.reduce((previouValue, currentValue) => {
-        if (currentValue.id === team.id) {
-          return [...previouValue, team];
-        } else {
-          return [...previouValue, currentValue];
-        }
-      }, [] as Team[]);
+  async update(team: Team) {
+    try {
+      const db = await connectDb();
+      await this.collection(db).update(
+        { id: team.id },
+        updateTeamMapper({ name: team.name, ownerId: team.ownerId }),
+      );
 
-      resolve(team);
-    });
+      return team;
+    } catch (e) {
+      console.error(e);
+      throw new InfrastructureError("エラーが発生しました");
+    }
   }
 
-  private teamUserIds(teamId: Team["id"]) {
-    return new Promise<Team["id"][]>((resolve) => {
-      const team = teams.find((t) => t.id === teamId);
+  private daoToTeam(dao: TeamDao) {
+    return new Team(dao.id, dao.name, dao.ownerId, dao.userIds);
+  }
 
-      resolve(team ? team.userIds : []);
-    });
+  private collection(db: Db) {
+    return db.collection<TeamDB>("teams");
   }
 }

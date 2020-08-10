@@ -20,7 +20,7 @@ export class Team {
   }
 
   get name() {
-    return this._name;
+    return this._name.value;
   }
 
   get ownerId() {
