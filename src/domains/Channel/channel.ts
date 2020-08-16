@@ -60,4 +60,20 @@ export class Channel {
 
     this._userIds = [...this.userIds, target.id];
   }
+
+  removeUser(host: User, target: User) {
+    if (host.isMember || (host.isAdmin && host.id !== this.ownerId)) {
+      throw new DomainError("他のユーザを削除する権限がありません");
+    }
+
+    if (!this.userIds.includes(target.id)) {
+      throw new DomainError("チャンネルに所属していません");
+    }
+
+    if (this.teamId !== host.teamId || this.teamId !== target.teamId) {
+      throw new DomainError("別のチームのチャンネルの操作をすることはできません");
+    }
+
+    this._userIds = this.userIds.filter((userId) => userId !== target.id);
+  }
 }

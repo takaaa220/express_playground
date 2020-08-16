@@ -53,7 +53,22 @@ export class ChannelUseCase {
     }
 
     channel.invite(currentUser, targetUser);
-    console.log({ channel });
+    await this.channelRepository.update(channel);
+    return channel;
+  }
+
+  async removeUser(channelId: string, userId: string) {
+    const currentUser = await this.sessionRepository.getUser();
+    if (!currentUser) throw new UseCaseError("ログインしてください");
+
+    const targetUser = await this.userRepository.get(userId);
+
+    const channel = await this.channelRepository.get(channelId);
+    if (!channel) {
+      throw new UseCaseError("チャンネルが見つかりませんでした");
+    }
+
+    channel.removeUser(currentUser, targetUser);
     await this.channelRepository.update(channel);
     return channel;
   }

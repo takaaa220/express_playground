@@ -46,4 +46,16 @@ export class ChannelController {
 
     return this.useCase.inviteUser(params.channelId, body.userId);
   }
+
+  removeUser(params: { teamId?: string; channelId?: string }, body: { userId?: string }) {
+    if (
+      params.teamId === undefined ||
+      params.channelId === undefined ||
+      body.userId === undefined
+    ) {
+      throw new PresentationError("リクエストが正しくありません");
+    }
+
+    return this.useCase.removeUser(params.channelId, body.userId);
+  }
 }

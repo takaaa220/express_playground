@@ -24,4 +24,10 @@ router.route("/:channelId/invite").post(async (req, res) => {
   res.json({ channel });
 });
 
+router.route("/:channelId/removeUser").delete(async (req, res) => {
+  await channelController.removeUser(req.params, req.body);
+
+  res.json({ status: "ok" });
+});
+
 export default router;
