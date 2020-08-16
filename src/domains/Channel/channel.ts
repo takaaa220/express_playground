@@ -2,7 +2,7 @@ import { ChannelName } from "./name";
 import { User } from "../User/user";
 import { Team } from "../Team/team";
 import { DomainError } from "../helpers/error";
-import { throws } from "assert";
+import { ChannelStatus } from "./status";
 
 export class Channel {
   private _name: ChannelName;
@@ -14,6 +14,7 @@ export class Channel {
     private _ownerId: User["id"],
     private _userIds: User["id"][],
     private _teamid: Team["id"],
+    private _status: ChannelStatus,
   ) {
     this._name = new ChannelName(name);
   }
@@ -42,28 +43,68 @@ export class Channel {
     return this._deleted;
   }
 
+  get status() {
+    return this._status;
+  }
+
+  get isPrivate() {
+    return this._status === "private";
+  }
+
+  get isPublic() {
+    return this._status === "public";
+  }
+
+  join(host: User) {
+    if (!host.belongsToTeam(this.teamId)) {
+      throw new DomainError("別のチームのチャンネルに参加することはできません");
+    }
+
+    if (this.joined(host)) {
+      throw new DomainError("すでにチャンネルに入っています");
+    }
+
+    if (!host.isOwner && this.isPrivate) {
+      throw new DomainError("プライベートチャンネルに参加する権限がありません");
+    }
+
+    this.addUser(host);
+  }
+
+  leave(host: User) {
+    if (!host.belongsToTeam(this.teamId)) {
+      throw new DomainError("別のチームチャンネルを操作することはできません");
+    }
+
+    if (!this.joined(host)) {
+      throw new DomainError("チャンネルに入っていません");
+    }
+
+    this._userIds = this._userIds.filter((userId) => userId !== host.id);
+  }
+
   invite(host: User, target: User) {
     if (host.isMember) {
       throw new DomainError("メンバー権限のユーザは他のユーザを招待することはできません");
     }
 
-    if (host.isAdmin && !this.userIds.includes(host.id)) {
+    if (host.isAdmin && !this.joined(host)) {
       throw new DomainError("自分が入っていないチャンネルにユーザを招待することはできません");
     }
 
-    if (this.userIds.includes(target.id)) {
+    if (this.joined(target)) {
       throw new DomainError("すでにチャンネルに入っています");
     }
 
-    if (this.teamId !== host.teamId) {
+    if (!host.belongsToTeam(this.teamId)) {
       throw new DomainError("別のチームのチャンネルにユーザを招待することはできません");
     }
 
-    if (this.teamId !== target.teamId) {
+    if (!target.belongsToTeam(this.teamId)) {
       throw new DomainError("別のチームのユーザをチャンネルに招待することはできません");
     }
 
-    this._userIds = [...this.userIds, target.id];
+    this.addUser(target);
   }
 
   delete(host: User) {
@@ -83,7 +124,7 @@ export class Channel {
       throw new DomainError("他のユーザを削除する権限がありません");
     }
 
-    if (!this.userIds.includes(target.id)) {
+    if (this.joined(target)) {
       throw new DomainError("チャンネルに所属していません");
     }
 
@@ -106,7 +147,27 @@ export class Channel {
     this._name = new ChannelName(name);
   }
 
+  changeStatus(host: User, isPrivate: boolean) {
+    if (!this.hasAuthority(host)) {
+      throw new DomainError("権限がありません");
+    }
+
+    if (!host.belongsToTeam(this.teamId)) {
+      throw new DomainError("別のチームのチャンネルを操作することはできません");
+    }
+
+    this._status = isPrivate ? "private" : "public";
+  }
+
   private hasAuthority(host: User) {
     return !(host.isMember || (host.isAdmin && host.id !== this.ownerId));
+  }
+
+  private joined(user: User) {
+    return this.userIds.includes(user.id);
+  }
+
+  private addUser(user: User) {
+    this._userIds = [...this._userIds, user.id];
   }
 }

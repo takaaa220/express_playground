@@ -27,12 +27,20 @@ export class ChannelUseCase {
     return this.channelRepository.getAllByTeamId(team.id);
   }
 
-  async create(teamId: string, channelName: string) {
+  async create(
+    teamId: string,
+    { channelName, isPrivate }: { channelName: string; isPrivate: boolean },
+  ) {
     const currentUser = await this.sessionRepository.getUser();
     if (!currentUser) throw new UseCaseError("ログインしてください");
 
     const team = await this.teamRepository.get(teamId);
-    const channel = team.createChannel(currentUser, createId(), channelName);
+    const channel = team.createChannel(
+      currentUser,
+      createId(),
+      channelName,
+      isPrivate ? "private" : "public",
+    );
 
     const uniqueChannelNameService = new UniqueChannelNameService(this.channelRepository);
     await uniqueChannelNameService.call(channel);
@@ -68,6 +76,34 @@ export class ChannelUseCase {
     const uniqueChannelNameService = new UniqueChannelNameService(this.channelRepository);
     await uniqueChannelNameService.call(channel);
 
+    await this.channelRepository.update(channel);
+    return channel;
+  }
+
+  async join(channelId: string) {
+    const currentUser = await this.sessionRepository.getUser();
+    if (!currentUser) throw new UseCaseError("ログインしてください");
+
+    const channel = await this.channelRepository.get(channelId);
+    if (!channel) {
+      throw new UseCaseError("チャンネルが見つかりませんでした");
+    }
+
+    channel.join(currentUser);
+    await this.channelRepository.update(channel);
+    return channel;
+  }
+
+  async leave(channelId: string) {
+    const currentUser = await this.sessionRepository.getUser();
+    if (!currentUser) throw new UseCaseError("ログインしてください");
+
+    const channel = await this.channelRepository.get(channelId);
+    if (!channel) {
+      throw new UseCaseError("チャンネルが見つかりませんでした");
+    }
+
+    channel.leave(currentUser);
     await this.channelRepository.update(channel);
     return channel;
   }

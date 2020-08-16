@@ -2,6 +2,7 @@ import { TeamName } from "./name";
 import { User } from "../User/user";
 import { DomainError } from "../helpers/error";
 import { Channel } from "../Channel/channel";
+import { ChannelStatus } from "../Channel/status";
 
 export class Team {
   private _id: string;
@@ -83,12 +84,12 @@ export class Team {
     this._deleted = true;
   }
 
-  createChannel(host: User, id: string, channelName: string) {
+  createChannel(host: User, id: string, channelName: string, status: ChannelStatus) {
     if (host.isMember) {
       throw new DomainError("メンバー権限のユーザはチャンネルを作成する事ができません");
     }
 
-    return new Channel(id, channelName, host.id, [host.id], this.id);
+    return new Channel(id, channelName, host.id, [host.id], this.id, status);
   }
 
   private isOwner(targetId: User["id"]) {

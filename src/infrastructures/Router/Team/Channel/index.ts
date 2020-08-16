@@ -29,6 +29,18 @@ router.route("/:channelId").delete(async (req, res) => {
   res.json(response);
 });
 
+router.route("/:channelId/join").post(async (req, res) => {
+  const response = await channelController.join(req.params);
+
+  res.json(response);
+});
+
+router.route("/:channelId/leave").post(async (req, res) => {
+  const response = await channelController.leave(req.params);
+
+  res.json(response);
+});
+
 router.route("/:channelId/invite").post(async (req, res) => {
   const response = await channelController.invite(req.params, req.body);
 

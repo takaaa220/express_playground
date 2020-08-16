@@ -6,6 +6,7 @@ import { ChannelDao } from "./channelDao";
 import { createChannelMapper, updateChannelMapper } from "./channelMapper";
 import { Team } from "../../../domains/Team/team";
 import { InfrastructureError } from "../../helpers/error";
+import { ChannelStatus } from "../../../domains/Channel/status";
 
 type ChannelDB = {
   id: string;
@@ -15,6 +16,7 @@ type ChannelDB = {
   userIds: string[];
   createdAt: Date;
   updatedAt: Date;
+  status?: ChannelStatus;
 };
 
 export class ChannelRepository implements IChannelRepository {
@@ -31,6 +33,7 @@ export class ChannelRepository implements IChannelRepository {
             channelData.ownerId,
             channelData.teamId,
             channelData.userIds,
+            channelData.status ?? "public",
           ),
         ),
       ),
@@ -49,6 +52,7 @@ export class ChannelRepository implements IChannelRepository {
         channelData.ownerId,
         channelData.teamId,
         channelData.userIds,
+        channelData.status ?? "public",
       ),
     );
   }
@@ -63,6 +67,7 @@ export class ChannelRepository implements IChannelRepository {
         ownerId: channel.ownerId,
         teamId: channel.teamId,
         userIds: channel.userIds,
+        status: channel.status,
       }),
     );
   }
@@ -77,6 +82,7 @@ export class ChannelRepository implements IChannelRepository {
           name: channel.name,
           userIds: channel.userIds,
           ownerId: channel.ownerId,
+          status: channel.status,
         }),
       },
     );
@@ -92,7 +98,7 @@ export class ChannelRepository implements IChannelRepository {
   }
 
   private daoToChannel(dao: ChannelDao) {
-    return new Channel(dao.id, dao.name, dao.ownerId, dao.userIds, dao.teamId);
+    return new Channel(dao.id, dao.name, dao.ownerId, dao.userIds, dao.teamId, dao.status);
   }
 
   private connection(db: Db) {
