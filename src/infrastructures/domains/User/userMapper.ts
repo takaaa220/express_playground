@@ -22,3 +22,13 @@ export const createUserMapper = ({
     updatedAt: now,
   };
 };
+
+export const updateUserMapper = ({ name, role }: { name: string; role: UserRole }) => {
+  const now = new Date();
+
+  return {
+    name,
+    role,
+    updatedAt: now,
+  };
+};

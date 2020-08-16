@@ -1,9 +1,9 @@
 type Code = "InvalidArgument";
 
 export class DomainError extends Error {
-  code: Code;
+  code?: Code;
 
-  constructor(message: string, code: Code) {
+  constructor(message: string, code?: Code) {
     super(message);
 
     this.code = code;

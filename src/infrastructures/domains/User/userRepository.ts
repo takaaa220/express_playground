@@ -2,7 +2,7 @@ import { User } from "../../../domains/User/user";
 import { IUserRepository } from "../../../domains/User/userRepository";
 import { InfrastructureError } from "../../helpers/error";
 import { connectDb } from "../../database/mongodb";
-import { createUserMapper } from "./userMapper";
+import { createUserMapper, updateUserMapper } from "./userMapper";
 import { Db } from "mongodb";
 import { UserDao } from "./userDao";
 import { UserRole } from "../../../domains/User/role";
@@ -76,6 +76,24 @@ export class UserRepository implements IUserRepository {
         }),
       );
       if (!res.result.ok) throw new InfrastructureError("ユーザの作成に失敗しました");
+
+      return user;
+    } catch (e) {
+      console.error(e);
+      throw new InfrastructureError("エラーが発生しました");
+    }
+  }
+
+  async update(user: User) {
+    try {
+      const db = await connectDb();
+      const res = await this.collection(db).update(
+        { id: user.id },
+        updateUserMapper({
+          name: user.name,
+          role: user.role,
+        }),
+      );
 
       return user;
     } catch (e) {

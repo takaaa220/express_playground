@@ -23,6 +23,14 @@ export class Team {
     return this._name.value;
   }
 
+  updateName(name: string, user: User) {
+    if (!user.isOwner) {
+      throw new DomainError("チーム名の変更はオーナーのみ行うことができます");
+    }
+
+    this._name = new TeamName(name);
+  }
+
   get ownerId() {
     return this._ownerId;
   }
@@ -41,6 +49,16 @@ export class Team {
     }
 
     this._userIds = [...this.userIds, target.id];
+  }
+
+  changeOwner(currentOwner: User, newOwner: User) {
+    if (currentOwner.teamId !== this.id || newOwner.teamId !== this.id)
+      throw new DomainError("オーナーの交代は同一チーム内で行うことができます");
+
+    if (!currentOwner.isOwner || !newOwner.isAdmin || this.ownerId !== currentOwner.id)
+      throw new DomainError("権限がおかしいんだよなぁ...");
+
+    this._ownerId = newOwner.id;
   }
 
   private isOwner(targetId: User["id"]) {

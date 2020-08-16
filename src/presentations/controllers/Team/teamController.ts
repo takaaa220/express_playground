@@ -30,4 +30,12 @@ export class TeamController {
 
     return this.useCase.inviteUser(params.teamId, requestBody.name);
   }
+
+  async changeOwner(params: { teamId?: string; newOwnerId?: string }) {
+    if (params.teamId === undefined || params.newOwnerId === undefined) {
+      throw new PresentationError("りくえすとがただしくありません");
+    }
+
+    return this.useCase.changeOwner(params.teamId, params.newOwnerId);
+  }
 }

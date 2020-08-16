@@ -17,4 +17,10 @@ router.post("/:teamId/invite", async (req, res) => {
   res.json({ team });
 });
 
+router.post("/:teamId/changeOwner/:newOwnerId", async (req, res) => {
+  await teamController.changeOwner(req.params);
+
+  res.json({ status: "ok" });
+});
+
 export default router;
