@@ -13,6 +13,17 @@ export class TeamUseCase {
     private sessionRepository: ISessionRepository,
   ) {}
 
+  async getAllTeams() {
+    // システムの管理者権限を持つユーザしか操作することができないようにする
+    const isSystemOwner = await this.sessionRepository.isSystemOwner();
+
+    if (!isSystemOwner) {
+      throw new UseCaseError("システム管理者のみリクエストすることができます");
+    }
+
+    return this.teamRepository.getAll({});
+  }
+
   async createTeam(name: string, ownerName: string) {
     const ownerId = createId();
     const teamId = createId();

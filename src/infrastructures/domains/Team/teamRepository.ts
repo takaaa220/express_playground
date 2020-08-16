@@ -16,6 +16,31 @@ type TeamDB = {
 };
 
 export class TeamRepository implements ITeamRepository {
+  async getAll({ limit = 50 }: { limit?: number }): Promise<Team[]> {
+    const db = await connectDb();
+
+    const teamsData = await this.collection(db).find().limit(limit).toArray();
+
+    const userRepository = new UserRepository();
+    const teams = teamsData.map(async (team) => {
+      const users = await userRepository.getAllByTeamId(team.id);
+      const teamUserIds = users.map((u) => u.id);
+
+      const dao = new TeamDao(
+        team.id,
+        team.name,
+        team.ownerId,
+        team.createdAt,
+        team.updatedAt,
+        teamUserIds,
+      );
+
+      return this.daoToTeam(dao);
+    });
+
+    return Promise.all(teams);
+  }
+
   async get(teamId: Team["id"]) {
     try {
       const db = await connectDb();

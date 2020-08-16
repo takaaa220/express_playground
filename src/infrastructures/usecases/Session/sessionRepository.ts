@@ -10,4 +10,9 @@ export class SessionRepository implements ISessionRepository {
     this.id = await Promise.resolve<string>("b12ace8f-5225-4272-a2df-0843a9edff8b");
     return this.id;
   }
+
+  async isSystemOwner() {
+    // @TODO: いい感じにsession情報から取得する
+    return Promise.resolve(false);
+  }
 }

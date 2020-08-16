@@ -5,6 +5,12 @@ const router = express();
 
 const teamController = new TeamController();
 
+router.get("/", async (_, res) => {
+  const teams = await teamController.getAll();
+
+  res.json({ teams });
+});
+
 router.post("/", async (req, res) => {
   const team = await teamController.create(req.body);
 

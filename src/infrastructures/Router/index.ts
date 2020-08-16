@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
 import TeamRouter from "./Team";
 
@@ -11,5 +11,22 @@ router.get("/", (_, res) => {
 });
 
 router.use("/team", TeamRouter);
+
+// エラー時のログを収集する
+const logErrors = (err: Error, _: Request, __: Response, next: NextFunction) => {
+  console.error(err.stack);
+  next(err);
+};
+
+// エラーハンドリング
+// @TODO: Controllerでいい感じに詰め替える
+// @TODO: async function内のエラーはどうやら拾えない様子なので、修正する
+const errorHandler = (_: Error, __: Request, res: Response, ___: NextFunction) => {
+  res.status(500);
+  res.json({ error: "エラーが発生しました" });
+};
+
+router.use(logErrors);
+router.use(errorHandler);
 
 export default router;

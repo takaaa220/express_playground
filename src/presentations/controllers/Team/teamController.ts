@@ -17,6 +17,10 @@ export class TeamController {
     );
   }
 
+  async getAll() {
+    return this.useCase.getAllTeams();
+  }
+
   async create(requestBody: {}) {
     const form = new CreateTeamForm(requestBody);
 
