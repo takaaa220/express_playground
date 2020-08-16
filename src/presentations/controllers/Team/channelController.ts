@@ -53,6 +53,22 @@ export class ChannelController {
     return { channel };
   }
 
+  async changeStatus(
+    params: { teamId?: string; channelId?: string },
+    body: { isPrivate?: boolean },
+  ) {
+    if (
+      params.teamId === undefined ||
+      params.channelId === undefined ||
+      body.isPrivate === undefined
+    ) {
+      throw new PresentationError("リクエストが正しくありません");
+    }
+
+    const channel = await this.useCase.changeStatus(params.channelId, body.isPrivate);
+    return { channel };
+  }
+
   async delete(params: { teamId?: string; channelId?: string }) {
     if (params.teamId === undefined || params.channelId === undefined) {
       throw new PresentationError("リクエストが正しくありません");

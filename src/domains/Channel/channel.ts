@@ -64,7 +64,7 @@ export class Channel {
       throw new DomainError("すでにチャンネルに入っています");
     }
 
-    if (!host.isOwner && this.isPrivate) {
+    if (!this.hasAuthority(host) && this.isPrivate) {
       throw new DomainError("プライベートチャンネルに参加する権限がありません");
     }
 
@@ -107,18 +107,6 @@ export class Channel {
     this.addUser(target);
   }
 
-  delete(host: User) {
-    if (!this.hasAuthority(host)) {
-      throw new DomainError("権限がありません");
-    }
-
-    if (!host.belongsToTeam(this.teamId)) {
-      throw new DomainError("別のチームのチャンネルを操作する事はできません");
-    }
-
-    this._deleted = true;
-  }
-
   removeUser(host: User, target: User) {
     if (!this.hasAuthority(host)) {
       throw new DomainError("他のユーザを削除する権限がありません");
@@ -133,6 +121,18 @@ export class Channel {
     }
 
     this._userIds = this.userIds.filter((userId) => userId !== target.id);
+  }
+
+  delete(host: User) {
+    if (!this.hasAuthority(host)) {
+      throw new DomainError("権限がありません");
+    }
+
+    if (!host.belongsToTeam(this.teamId)) {
+      throw new DomainError("別のチームのチャンネルを操作する事はできません");
+    }
+
+    this._deleted = true;
   }
 
   updateName(host: User, name: string) {

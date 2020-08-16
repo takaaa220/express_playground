@@ -80,6 +80,21 @@ export class ChannelUseCase {
     return channel;
   }
 
+  async changeStatus(channelId: string, isPrivate: boolean) {
+    const currentUser = await this.sessionRepository.getUser();
+    if (!currentUser) throw new UseCaseError("ログインしてください");
+
+    const channel = await this.channelRepository.get(channelId);
+    if (!channel) {
+      throw new UseCaseError("チャンネルが見つかりませんでした");
+    }
+
+    channel.changeStatus(currentUser, isPrivate);
+
+    await this.channelRepository.update(channel);
+    return channel;
+  }
+
   async join(channelId: string) {
     const currentUser = await this.sessionRepository.getUser();
     if (!currentUser) throw new UseCaseError("ログインしてください");

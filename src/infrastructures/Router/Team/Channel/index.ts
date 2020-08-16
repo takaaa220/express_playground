@@ -23,6 +23,12 @@ router.route("/:channelId").put(async (req, res) => {
   res.json(response);
 });
 
+router.route("/:channelId/changeStatus").put(async (req, res) => {
+  const response = await channelController.changeStatus(req.params, req.body);
+
+  res.json(response);
+});
+
 router.route("/:channelId").delete(async (req, res) => {
   const response = await channelController.delete(req.params);
 
