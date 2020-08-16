@@ -5,4 +5,5 @@ export interface IChannelRepository {
   getAllByTeamId(teamId: Team["id"]): Promise<Channel[]>;
   get(channelId: Channel["id"]): Promise<Channel | undefined>;
   create(channel: Channel): Promise<void>;
+  update(channel: Channel): Promise<void>;
 }

@@ -9,7 +9,7 @@ export class SessionRepository implements ISessionRepository {
   async getUser() {
     if (this.user) return this.user;
 
-    const userId = "2332bcb5-a7b9-49c3-a28a-feea947be624";
+    const userId = "a79af6ed-b82c-4807-bbea-9725cf20f692";
     this.user = await this.userRepository.get(userId);
 
     return this.user;

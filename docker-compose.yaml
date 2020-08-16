@@ -5,7 +5,7 @@ services:
     image: mongo
     restart: always
     environment:
-      MONGO_INITDB_DATABASE: onion-test
+      MONGO_INITDB_DATABASE: onion_test
     ports:
       - 28001:27017
     volumes:

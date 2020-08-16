@@ -1,6 +1,6 @@
 import { MongoClient, Db } from "mongodb";
 
-const DB_NAME = "onion-test";
+const DB_NAME = "onion_test";
 const DB_PORT = "28001";
 const DB_HOST = "localhost";
 const DB_URL = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`;

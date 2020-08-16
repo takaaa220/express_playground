@@ -40,6 +40,7 @@ export class TeamUseCase {
     if (!currentUser) throw new UseCaseError("ログインしてください");
 
     const target = new User(createId(), targetUserName, "Member", teamId);
+    await this.userRepository.create(target);
 
     const team = await this.teamRepository.get(teamId);
     team.invite(currentUser, target);

@@ -15,6 +15,7 @@ export class ChannelController {
       new TeamRepository(),
       new SessionRepository(userRepository),
       new ChannelRepository(),
+      new UserRepository(),
     );
   }
 
@@ -32,5 +33,17 @@ export class ChannelController {
     }
 
     return this.useCase.create(params.teamId, body.channelName);
+  }
+
+  invite(params: { teamId?: string; channelId?: string }, body: { userId: string }) {
+    if (
+      params.teamId === undefined ||
+      params.channelId === undefined ||
+      body.userId === undefined
+    ) {
+      throw new PresentationError("リクエストが正しくありません");
+    }
+
+    return this.useCase.inviteUser(params.channelId, body.userId);
   }
 }

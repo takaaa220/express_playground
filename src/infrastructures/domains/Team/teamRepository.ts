@@ -83,9 +83,16 @@ export class TeamRepository implements ITeamRepository {
   async update(team: Team) {
     try {
       const db = await connectDb();
-      await this.collection(db).update(
+      await this.collection(db).updateOne(
         { id: team.id },
-        updateTeamMapper({ name: team.name, ownerId: team.ownerId, userIds: team.userIds }),
+        {
+          $set: updateTeamMapper({
+            id: team.id,
+            name: team.name,
+            ownerId: team.ownerId,
+            userIds: team.userIds,
+          }),
+        },
       );
 
       return team;

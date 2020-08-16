@@ -23,3 +23,22 @@ export const createChannelMapper = ({
     updatedAt: now,
   };
 };
+
+export const updateChannelMapper = ({
+  name,
+  ownerId,
+  userIds,
+}: {
+  name: string;
+  ownerId: string;
+  userIds: string[];
+}) => {
+  const now = new Date();
+
+  return {
+    name,
+    ownerId,
+    userIds,
+    updatedAt: now,
+  };
+};

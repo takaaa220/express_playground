@@ -22,10 +22,12 @@ export const createTeamMapper = ({
 };
 
 export const updateTeamMapper = ({
+  id,
   name,
   ownerId,
   userIds,
 }: {
+  id: string;
   name: string;
   ownerId: string;
   userIds: string[];
@@ -33,6 +35,7 @@ export const updateTeamMapper = ({
   const now = new Date();
 
   return {
+    id,
     name,
     ownerId,
     updatedAt: now,

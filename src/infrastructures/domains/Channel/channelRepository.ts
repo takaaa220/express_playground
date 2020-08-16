@@ -3,7 +3,7 @@ import { Channel } from "../../../domains/Channel/channel";
 import { connectDb } from "../../database/mongodb";
 import { Db } from "mongodb";
 import { ChannelDao } from "./channelDao";
-import { createChannelMapper } from "./channelMapper";
+import { createChannelMapper, updateChannelMapper } from "./channelMapper";
 import { Team } from "../../../domains/Team/team";
 
 type ChannelDB = {
@@ -63,6 +63,21 @@ export class ChannelRepository implements IChannelRepository {
         teamId: channel.teamId,
         userIds: channel.userIds,
       }),
+    );
+  }
+
+  async update(channel: Channel) {
+    const db = await connectDb();
+
+    await this.connection(db).updateOne(
+      { id: channel.id },
+      {
+        $set: updateChannelMapper({
+          name: channel.name,
+          userIds: channel.userIds,
+          ownerId: channel.ownerId,
+        }),
+      },
     );
   }
 

@@ -18,4 +18,10 @@ router.route("/").post(async (req, res) => {
   res.json({ channel });
 });
 
+router.route("/:channelId/invite").post(async (req, res) => {
+  const channel = channelController.invite(req.params, req.body);
+
+  res.json({ channel });
+});
+
 export default router;
