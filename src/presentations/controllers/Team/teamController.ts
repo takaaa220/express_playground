@@ -19,13 +19,15 @@ export class TeamController {
   }
 
   async getAll() {
-    return this.useCase.getAllTeams();
+    const teams = await this.useCase.getAllTeams();
+    return { teams };
   }
 
   async create(requestBody: {}) {
     const form = new CreateTeamForm(requestBody);
 
-    return this.useCase.createTeam(form.name, form.ownerName);
+    const team = await this.useCase.createTeam(form.name, form.ownerName);
+    return { team };
   }
 
   async inviteUser(params: { teamId?: string }, requestBody: { name?: string }) {
@@ -33,7 +35,8 @@ export class TeamController {
       throw new PresentationError("リクエストが正しくありません");
     }
 
-    return this.useCase.inviteUser(params.teamId, requestBody.name);
+    const team = await this.useCase.inviteUser(params.teamId, requestBody.name);
+    return { team };
   }
 
   async changeOwner(params: { teamId?: string; newOwnerId?: string }) {
@@ -41,7 +44,8 @@ export class TeamController {
       throw new PresentationError("りくえすとがただしくありません");
     }
 
-    return this.useCase.changeOwner(params.teamId, params.newOwnerId);
+    const team = await this.useCase.changeOwner(params.teamId, params.newOwnerId);
+    return { team };
   }
 
   async delete(params: { teamId?: string }) {
@@ -49,6 +53,7 @@ export class TeamController {
       throw new PresentationError("リクエストが正しくありません");
     }
 
-    return this.useCase.delete(params.teamId);
+    await this.useCase.delete(params.teamId);
+    return;
   }
 }

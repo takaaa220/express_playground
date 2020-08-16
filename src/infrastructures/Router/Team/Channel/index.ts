@@ -6,40 +6,39 @@ const router = express.Router({ mergeParams: true });
 const channelController = new ChannelController();
 
 router.route("/").get(async (req, res) => {
-  const channels = await channelController.getAll(req.params);
+  const response = await channelController.getAll(req.params);
 
-  res.json({ channels });
+  res.json(response);
 });
 
 router.route("/").post(async (req, res) => {
-  const channel = await channelController.create(req.params, req.body);
+  const response = await channelController.create(req.params, req.body);
 
-  // TODO: serialize
-  res.json({ channel });
+  res.json(response);
 });
 
 router.route("/:channelId").put(async (req, res) => {
-  const channel = channelController.update(req.params, req.body);
+  const response = await channelController.update(req.params, req.body);
 
-  res.json({ channel });
+  res.json(response);
 });
 
 router.route("/:channelId").delete(async (req, res) => {
-  await channelController.delete(req.params);
+  const response = await channelController.delete(req.params);
 
-  res.json({ status: "ok" });
+  res.json(response);
 });
 
 router.route("/:channelId/invite").post(async (req, res) => {
-  const channel = channelController.invite(req.params, req.body);
+  const response = await channelController.invite(req.params, req.body);
 
-  res.json({ channel });
+  res.json(response);
 });
 
 router.route("/:channelId/removeUser").delete(async (req, res) => {
-  await channelController.removeUser(req.params, req.body);
+  const response = await channelController.removeUser(req.params, req.body);
 
-  res.json({ status: "ok" });
+  res.json(response);
 });
 
 export default router;

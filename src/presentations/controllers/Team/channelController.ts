@@ -19,39 +19,43 @@ export class ChannelController {
     );
   }
 
-  getAll(params: { teamId?: string }) {
+  async getAll(params: { teamId?: string }) {
     if (params.teamId === undefined) {
       throw new PresentationError("リクエストが正しくありません");
     }
 
-    return this.useCase.getAll(params.teamId);
+    const channels = await this.useCase.getAll(params.teamId);
+    return { channels };
   }
 
-  create(params: { teamId?: string }, body: { channelName?: string }) {
+  async create(params: { teamId?: string }, body: { channelName?: string }) {
     if (params.teamId === undefined || body.channelName === undefined) {
       throw new PresentationError("リクエストが正しくありません");
     }
 
-    return this.useCase.create(params.teamId, body.channelName);
+    const channel = await this.useCase.create(params.teamId, body.channelName);
+    return { channel };
   }
 
-  update(params: { teamId?: string; channelId?: string }, body: { name?: string }) {
+  async update(params: { teamId?: string; channelId?: string }, body: { name?: string }) {
     if (params.teamId === undefined || params.channelId === undefined || body.name === undefined) {
       throw new PresentationError("リクエストが正しくありません");
     }
 
-    return this.useCase.update(params.channelId, body.name);
+    const channel = await this.useCase.update(params.channelId, body.name);
+    return { channel };
   }
 
-  delete(params: { teamId?: string; channelId?: string }) {
+  async delete(params: { teamId?: string; channelId?: string }) {
     if (params.teamId === undefined || params.channelId === undefined) {
       throw new PresentationError("リクエストが正しくありません");
     }
 
-    return this.useCase.delete(params.channelId);
+    await this.useCase.delete(params.channelId);
+    return;
   }
 
-  invite(params: { teamId?: string; channelId?: string }, body: { userId?: string }) {
+  async invite(params: { teamId?: string; channelId?: string }, body: { userId?: string }) {
     if (
       params.teamId === undefined ||
       params.channelId === undefined ||
@@ -60,10 +64,11 @@ export class ChannelController {
       throw new PresentationError("リクエストが正しくありません");
     }
 
-    return this.useCase.inviteUser(params.channelId, body.userId);
+    const channel = await this.useCase.inviteUser(params.channelId, body.userId);
+    return { channel };
   }
 
-  removeUser(params: { teamId?: string; channelId?: string }, body: { userId?: string }) {
+  async removeUser(params: { teamId?: string; channelId?: string }, body: { userId?: string }) {
     if (
       params.teamId === undefined ||
       params.channelId === undefined ||
@@ -72,6 +77,7 @@ export class ChannelController {
       throw new PresentationError("リクエストが正しくありません");
     }
 
-    return this.useCase.removeUser(params.channelId, body.userId);
+    const channel = await this.useCase.removeUser(params.channelId, body.userId);
+    return { channel };
   }
 }

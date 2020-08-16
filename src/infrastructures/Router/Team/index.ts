@@ -6,33 +6,33 @@ const router = express.Router();
 const teamController = new TeamController();
 
 router.route("/").get(async (_, res) => {
-  const teams = await teamController.getAll();
+  const response = await teamController.getAll();
 
-  res.json({ teams });
+  res.json(response);
 });
 
 router.route("/").post(async (req, res) => {
-  const team = await teamController.create(req.body);
+  const response = await teamController.create(req.body);
 
-  res.json({ team });
+  res.json(response);
 });
 
 router.route("/:teamId").delete(async (req, res) => {
-  await teamController.delete(req.params);
+  const response = await teamController.delete(req.params);
 
-  res.json({ status: "ok" });
+  res.json(response);
 });
 
 router.route("/:teamId/invite").post(async (req, res) => {
-  const team = await teamController.inviteUser(req.params, req.body);
+  const response = await teamController.inviteUser(req.params, req.body);
 
-  res.json({ team });
+  res.json(response);
 });
 
 router.route("/:teamId/changeOwner/:newOwnerId").post(async (req, res) => {
-  await teamController.changeOwner(req.params);
+  const response = await teamController.changeOwner(req.params);
 
-  res.json({ status: "ok" });
+  res.json(response);
 });
 
 export default router;
