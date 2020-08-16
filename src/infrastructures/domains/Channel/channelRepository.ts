@@ -5,6 +5,7 @@ import { Db } from "mongodb";
 import { ChannelDao } from "./channelDao";
 import { createChannelMapper, updateChannelMapper } from "./channelMapper";
 import { Team } from "../../../domains/Team/team";
+import { InfrastructureError } from "../../helpers/error";
 
 type ChannelDB = {
   id: string;
@@ -79,6 +80,15 @@ export class ChannelRepository implements IChannelRepository {
         }),
       },
     );
+  }
+
+  async delete(channel: Channel) {
+    if (!channel.deleted) {
+      throw new InfrastructureError("チャンネルの削除に失敗しました");
+    }
+
+    const db = await connectDb();
+    await this.connection(db).deleteOne({ id: channel.id });
   }
 
   private daoToChannel(dao: ChannelDao) {

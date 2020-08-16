@@ -70,4 +70,8 @@ export class User {
 
     this._role = "Owner";
   }
+
+  belongsToTeam(teamId: string) {
+    return teamId === this.teamId;
+  }
 }

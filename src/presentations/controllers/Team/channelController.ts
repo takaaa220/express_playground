@@ -43,6 +43,14 @@ export class ChannelController {
     return this.useCase.update(params.channelId, body.name);
   }
 
+  delete(params: { teamId?: string; channelId?: string }) {
+    if (params.teamId === undefined || params.channelId === undefined) {
+      throw new PresentationError("リクエストが正しくありません");
+    }
+
+    return this.useCase.delete(params.channelId);
+  }
+
   invite(params: { teamId?: string; channelId?: string }, body: { userId?: string }) {
     if (
       params.teamId === undefined ||

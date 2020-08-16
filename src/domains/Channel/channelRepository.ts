@@ -6,4 +6,5 @@ export interface IChannelRepository {
   get(channelId: Channel["id"]): Promise<Channel | undefined>;
   create(channel: Channel): Promise<void>;
   update(channel: Channel): Promise<void>;
+  delete(channel: Channel): Promise<void>;
 }

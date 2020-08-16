@@ -24,6 +24,12 @@ router.route("/:channelId").put(async (req, res) => {
   res.json({ channel });
 });
 
+router.route("/:channelId").delete(async (req, res) => {
+  await channelController.delete(req.params);
+
+  res.json({ status: "ok" });
+});
+
 router.route("/:channelId/invite").post(async (req, res) => {
   const channel = channelController.invite(req.params, req.body);
 

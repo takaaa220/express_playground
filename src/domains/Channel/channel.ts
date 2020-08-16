@@ -6,6 +6,7 @@ import { throws } from "assert";
 
 export class Channel {
   private _name: ChannelName;
+  private _deleted?: boolean;
 
   constructor(
     private _id: string,
@@ -37,6 +38,10 @@ export class Channel {
     return this._ownerId;
   }
 
+  get deleted() {
+    return this._deleted;
+  }
+
   invite(host: User, target: User) {
     if (host.isMember) {
       throw new DomainError("メンバー権限のユーザは他のユーザを招待することはできません");
@@ -61,6 +66,18 @@ export class Channel {
     this._userIds = [...this.userIds, target.id];
   }
 
+  delete(host: User) {
+    if (!this.hasAuthority(host)) {
+      throw new DomainError("権限がありません");
+    }
+
+    if (!host.belongsToTeam(this.teamId)) {
+      throw new DomainError("別のチームのチャンネルを操作する事はできません");
+    }
+
+    this._deleted = true;
+  }
+
   removeUser(host: User, target: User) {
     if (!this.hasAuthority(host)) {
       throw new DomainError("他のユーザを削除する権限がありません");
@@ -70,7 +87,7 @@ export class Channel {
       throw new DomainError("チャンネルに所属していません");
     }
 
-    if (this.teamId !== host.teamId || this.teamId !== target.teamId) {
+    if (!host.belongsToTeam(this.teamId) || !target.belongsToTeam(this.teamId)) {
       throw new DomainError("別のチームのチャンネルの操作をすることはできません");
     }
 
@@ -82,7 +99,7 @@ export class Channel {
       throw new DomainError("権限がありません");
     }
 
-    if (this.teamId !== host.teamId) {
+    if (!host.belongsToTeam(this.teamId)) {
       throw new DomainError("別のチームのチャンネルを操作する事はできません");
     }
 
