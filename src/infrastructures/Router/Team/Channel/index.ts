@@ -18,6 +18,12 @@ router.route("/").post(async (req, res) => {
   res.json({ channel });
 });
 
+router.route("/:channelId").put(async (req, res) => {
+  const channel = channelController.update(req.params, req.body);
+
+  res.json({ channel });
+});
+
 router.route("/:channelId/invite").post(async (req, res) => {
   const channel = channelController.invite(req.params, req.body);
 

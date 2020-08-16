@@ -35,9 +35,27 @@ export class ChannelUseCase {
     const channel = team.createChannel(currentUser, createId(), channelName);
 
     const uniqueChannelNameService = new UniqueChannelNameService(this.channelRepository);
-    uniqueChannelNameService.call(channel);
+    await uniqueChannelNameService.call(channel);
 
     await this.channelRepository.create(channel);
+    return channel;
+  }
+
+  async update(channelId: string, name: string) {
+    const currentUser = await this.sessionRepository.getUser();
+    if (!currentUser) throw new UseCaseError("ログインしてください");
+
+    const channel = await this.channelRepository.get(channelId);
+    if (!channel) {
+      throw new UseCaseError("チャンネルが見つかりませんでした");
+    }
+
+    channel.updateName(currentUser, name);
+
+    const uniqueChannelNameService = new UniqueChannelNameService(this.channelRepository);
+    await uniqueChannelNameService.call(channel);
+
+    await this.channelRepository.update(channel);
     return channel;
   }
 

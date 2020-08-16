@@ -35,7 +35,15 @@ export class ChannelController {
     return this.useCase.create(params.teamId, body.channelName);
   }
 
-  invite(params: { teamId?: string; channelId?: string }, body: { userId: string }) {
+  update(params: { teamId?: string; channelId?: string }, body: { name?: string }) {
+    if (params.teamId === undefined || params.channelId === undefined || body.name === undefined) {
+      throw new PresentationError("リクエストが正しくありません");
+    }
+
+    return this.useCase.update(params.channelId, body.name);
+  }
+
+  invite(params: { teamId?: string; channelId?: string }, body: { userId?: string }) {
     if (
       params.teamId === undefined ||
       params.channelId === undefined ||

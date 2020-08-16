@@ -62,7 +62,7 @@ export class Channel {
   }
 
   removeUser(host: User, target: User) {
-    if (host.isMember || (host.isAdmin && host.id !== this.ownerId)) {
+    if (!this.hasAuthority(host)) {
       throw new DomainError("他のユーザを削除する権限がありません");
     }
 
@@ -75,5 +75,21 @@ export class Channel {
     }
 
     this._userIds = this.userIds.filter((userId) => userId !== target.id);
+  }
+
+  updateName(host: User, name: string) {
+    if (!this.hasAuthority(host)) {
+      throw new DomainError("権限がありません");
+    }
+
+    if (this.teamId !== host.teamId) {
+      throw new DomainError("別のチームのチャンネルを操作する事はできません");
+    }
+
+    this._name = new ChannelName(name);
+  }
+
+  private hasAuthority(host: User) {
+    return !(host.isMember || (host.isAdmin && host.id !== this.ownerId));
   }
 }
