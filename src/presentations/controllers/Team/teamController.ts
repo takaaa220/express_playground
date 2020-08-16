@@ -10,10 +10,11 @@ export class TeamController {
   private useCase: TeamUseCase;
 
   constructor() {
+    const userRepository = new UserRepository();
     this.useCase = new TeamUseCase(
       new TeamRepository(),
-      new UserRepository(),
-      new SessionRepository(),
+      userRepository,
+      new SessionRepository(userRepository),
     );
   }
 

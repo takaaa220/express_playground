@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
 import TeamRouter from "./Team";
+import ChannelRouter from "./Team/Channel";
 
 const router = express();
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -11,6 +12,7 @@ router.get("/", (_, res) => {
 });
 
 router.use("/team", TeamRouter);
+router.use("/team/:teamId/channel", ChannelRouter);
 
 // エラー時のログを収集する
 const logErrors = (err: Error, _: Request, __: Response, next: NextFunction) => {

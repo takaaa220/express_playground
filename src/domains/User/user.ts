@@ -2,6 +2,7 @@ import { UserRole } from "./role";
 import { Team } from "../Team/team";
 import { UserName } from "./name";
 import { DomainError } from "../helpers/error";
+import { Channel } from "../Channel/channel";
 
 export class User {
   private _name: UserName;
@@ -11,6 +12,7 @@ export class User {
     name: string,
     private _role: UserRole,
     private _teamId: Team["id"] = "",
+    private _channelIds: Channel["id"][] = [],
   ) {
     this._name = new UserName(name);
   }

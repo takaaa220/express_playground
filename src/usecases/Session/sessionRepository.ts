@@ -1,6 +1,6 @@
 import { User } from "../../domains/User/user";
 
 export interface ISessionRepository {
-  getId(): Promise<User["id"] | undefined>;
+  getUser(): Promise<User | undefined>;
   isSystemOwner(): Promise<boolean>;
 }

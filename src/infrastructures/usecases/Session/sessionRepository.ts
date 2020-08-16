@@ -1,14 +1,18 @@
 import { User } from "../../../domains/User/user";
 import { ISessionRepository } from "../../../usecases/Session/sessionRepository";
+import { IUserRepository } from "../../../domains/User/userRepository";
 
 export class SessionRepository implements ISessionRepository {
-  private id: User["id"] | undefined;
+  private user: User | undefined;
+  constructor(private userRepository: IUserRepository) {}
 
-  async getId() {
-    if (this.id) return this.id;
+  async getUser() {
+    if (this.user) return this.user;
 
-    this.id = await Promise.resolve<string>("017f6e71-0a67-4387-9ca3-468a2f74c3b0");
-    return this.id;
+    const userId = "2332bcb5-a7b9-49c3-a28a-feea947be624";
+    this.user = await this.userRepository.get(userId);
+
+    return this.user;
   }
 
   async isSystemOwner() {

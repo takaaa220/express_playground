@@ -1,6 +1,7 @@
 import { TeamName } from "./name";
 import { User } from "../User/user";
 import { DomainError } from "../helpers/error";
+import { Channel } from "../Channel/channel";
 
 export class Team {
   private _id: string;
@@ -44,6 +45,10 @@ export class Team {
     return this._deleted;
   }
 
+  belongsTo(user: User) {
+    return user.teamId === this.id;
+  }
+
   invite(host: User, target: User) {
     if (!this.isOwner(host.id)) {
       throw new DomainError("チームへの招待はOwnerのみできます", "InvalidArgument");
@@ -76,6 +81,14 @@ export class Team {
     }
 
     this._deleted = true;
+  }
+
+  createChannel(host: User, id: string, channelName: string) {
+    if (host.isMember) {
+      throw new DomainError("メンバー権限のユーザはチャンネルを作成する事ができません");
+    }
+
+    return new Channel(id, channelName, host.id, [host.id], this.id);
   }
 
   private isOwner(targetId: User["id"]) {

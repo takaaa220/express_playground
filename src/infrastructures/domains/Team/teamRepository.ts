@@ -1,7 +1,6 @@
 import { Team } from "../../../domains/Team/team";
 import { ITeamRepository } from "../../../domains/Team/teamRepository";
 import { InfrastructureError } from "../../helpers/error";
-import { UserRepository } from "../User/userRepository";
 import { connectDb } from "../../database/mongodb";
 import { Db } from "mongodb";
 import { createTeamMapper, updateTeamMapper } from "./teamMapper";
@@ -13,6 +12,7 @@ type TeamDB = {
   ownerId: string;
   createdAt: Date;
   updatedAt: Date;
+  userIds: string[];
 };
 
 export class TeamRepository implements ITeamRepository {
@@ -21,18 +21,14 @@ export class TeamRepository implements ITeamRepository {
 
     const teamsData = await this.collection(db).find().limit(limit).toArray();
 
-    const userRepository = new UserRepository();
     const teams = teamsData.map(async (team) => {
-      const users = await userRepository.getAllByTeamId(team.id);
-      const teamUserIds = users.map((u) => u.id);
-
       const dao = new TeamDao(
         team.id,
         team.name,
         team.ownerId,
         team.createdAt,
         team.updatedAt,
-        teamUserIds,
+        team.userIds,
       );
 
       return this.daoToTeam(dao);
@@ -50,17 +46,13 @@ export class TeamRepository implements ITeamRepository {
         throw new Error("チームが見つかりませんでした");
       }
 
-      const userRepository = new UserRepository();
-      const users = await userRepository.getAllByTeamId(teamId);
-      const teamUserIds = users.map((u) => u.id);
-
       const dao = new TeamDao(
         teamData.id,
         teamData.name,
         teamData.ownerId,
         teamData.createdAt,
         teamData.updatedAt,
-        teamUserIds,
+        teamData.userIds,
       );
       return this.daoToTeam(dao);
     } catch (e) {
@@ -77,6 +69,7 @@ export class TeamRepository implements ITeamRepository {
           id: team.id,
           name: team.name,
           ownerId: team.ownerId,
+          userIds: team.userIds,
         }),
       );
 
@@ -92,7 +85,7 @@ export class TeamRepository implements ITeamRepository {
       const db = await connectDb();
       await this.collection(db).update(
         { id: team.id },
-        updateTeamMapper({ name: team.name, ownerId: team.ownerId }),
+        updateTeamMapper({ name: team.name, ownerId: team.ownerId, userIds: team.userIds }),
       );
 
       return team;

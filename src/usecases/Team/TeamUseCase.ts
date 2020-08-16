@@ -36,9 +36,8 @@ export class TeamUseCase {
   }
 
   async inviteUser(teamId: string, targetUserName: string) {
-    const currentUserId = await this.sessionRepository.getId();
-    if (!currentUserId) throw new UseCaseError("ログインしてください");
-    const currentUser = await this.userRepository.get(currentUserId);
+    const currentUser = await this.sessionRepository.getUser();
+    if (!currentUser) throw new UseCaseError("ログインしてください");
 
     const target = new User(createId(), targetUserName, "Member", teamId);
 
@@ -49,9 +48,8 @@ export class TeamUseCase {
   }
 
   async changeOwner(teamId: string, newOwnerId: string) {
-    const currentUserId = await this.sessionRepository.getId();
-    if (!currentUserId) throw new UseCaseError("ログインしてください");
-    const currentUser = await this.userRepository.get(currentUserId);
+    const currentUser = await this.sessionRepository.getUser();
+    if (!currentUser) throw new UseCaseError("ログインしてください");
 
     const newOwner = await this.userRepository.get(newOwnerId);
 
@@ -63,9 +61,8 @@ export class TeamUseCase {
   }
 
   async delete(teamId: string) {
-    const currentUserId = await this.sessionRepository.getId();
-    if (!currentUserId) throw new UseCaseError("ログインしてください");
-    const currentUser = await this.userRepository.get(currentUserId);
+    const currentUser = await this.sessionRepository.getUser();
+    if (!currentUser) throw new UseCaseError("ログインしてください");
 
     const team = await this.teamRepository.get(teamId);
     team.deleteTeam(currentUser);
