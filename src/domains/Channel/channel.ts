@@ -112,7 +112,7 @@ export class Channel {
       throw new DomainError("他のユーザを削除する権限がありません");
     }
 
-    if (this.joined(target)) {
+    if (!this.joined(target)) {
       throw new DomainError("チャンネルに所属していません");
     }
 

@@ -3,6 +3,7 @@ import { User } from "../User/user";
 import { DomainError } from "../helpers/error";
 import { Channel } from "../Channel/channel";
 import { ChannelStatus } from "../Channel/status";
+import { userInfo } from "os";
 
 export class Team {
   private _id: string;
@@ -92,14 +93,6 @@ export class Team {
     return new Channel(id, channelName, host.id, [host.id], this.id, status);
   }
 
-  private isOwner(targetId: User["id"]) {
-    return targetId === this.ownerId;
-  }
-
-  private isExistedUser(targetId: User["id"]) {
-    return this._userIds.includes(targetId);
-  }
-
   updateAttributes(host: User, attributes: { name: string }) {
     if (!this.belongsTo(host)) {
       throw new DomainError("別チームを操作する事はできません");
@@ -110,5 +103,25 @@ export class Team {
     }
 
     this._name = new TeamName(attributes.name);
+  }
+
+  removeUser(host: User, target: User) {
+    if (host.teamId !== this.id) {
+      throw new DomainError("別チームへの操作はできません");
+    }
+
+    if (!host.isOwner) {
+      throw new DomainError("ユーザの退会はオーナーしかできません");
+    }
+
+    this._userIds = this.userIds.filter((userId) => userId !== target.id);
+  }
+
+  private isOwner(targetId: User["id"]) {
+    return targetId === this.ownerId;
+  }
+
+  private isExistedUser(targetId: User["id"]) {
+    return this._userIds.includes(targetId);
   }
 }

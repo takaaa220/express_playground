@@ -8,5 +8,6 @@ export class UserDao {
     public role: UserRole,
     public createdAt: Date,
     public updatedAt: Date,
+    public deleted: boolean,
   ) {}
 }

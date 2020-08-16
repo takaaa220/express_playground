@@ -7,6 +7,7 @@ import { Db } from "mongodb";
 import { UserDao } from "./userDao";
 import { UserRole } from "../../../domains/User/role";
 import { Team } from "../../../domains/Team/team";
+import { DomainError } from "../../../domains/helpers/error";
 
 export type UserDB = {
   id: string;
@@ -15,6 +16,7 @@ export type UserDB = {
   teamId: string;
   createdAt: Date;
   updatedAt: Date;
+  deleted?: boolean;
 };
 
 export class UserRepository implements IUserRepository {
@@ -31,6 +33,7 @@ export class UserRepository implements IUserRepository {
           userData.role,
           userData.createdAt,
           userData.updatedAt,
+          userData.deleted ?? false,
         );
         return this.daoToUser(dao);
       });
@@ -55,6 +58,7 @@ export class UserRepository implements IUserRepository {
         user.role,
         user.createdAt,
         user.updatedAt,
+        user.deleted ?? false,
       );
 
       return this.daoToUser(dao);
@@ -87,7 +91,7 @@ export class UserRepository implements IUserRepository {
   async update(user: User) {
     try {
       const db = await connectDb();
-      const res = await this.collection(db).update(
+      await this.collection(db).update(
         { id: user.id },
         updateUserMapper({
           name: user.name,
@@ -102,11 +106,20 @@ export class UserRepository implements IUserRepository {
     }
   }
 
+  async delete(user: User) {
+    if (!user.deleted) {
+      throw new DomainError("ユーザの削除に失敗しました");
+    }
+    const db = await connectDb();
+
+    await this.collection(db).updateOne({ id: user.id }, { deleted: true });
+  }
+
   private collection(db: Db) {
     return db.collection<UserDB>("users");
   }
 
   private daoToUser(dao: UserDao) {
-    return new User(dao.id, dao.name, dao.role, dao.teamId);
+    return new User(dao.id, dao.name, dao.role, dao.teamId, dao.deleted);
   }
 }

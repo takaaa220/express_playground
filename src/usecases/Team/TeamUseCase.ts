@@ -5,12 +5,14 @@ import { createId } from "../../helpers/createId";
 import { Team } from "../../domains/Team/team";
 import { ISessionRepository } from "../Session/sessionRepository";
 import { UseCaseError } from "../helpers/error";
+import { IChannelRepository } from "../../domains/Channel/channelRepository";
 
 export class TeamUseCase {
   constructor(
     private teamRepository: ITeamRepository,
     private userRepository: IUserRepository,
     private sessionRepository: ISessionRepository,
+    private channelRepository: IChannelRepository,
   ) {}
 
   async getAllTeams() {
@@ -28,7 +30,7 @@ export class TeamUseCase {
     const ownerId = createId();
     const teamId = createId();
 
-    const owner = new User(ownerId, ownerName, "Owner", teamId);
+    const owner = new User(ownerId, ownerName, "Owner", teamId, false);
     await this.userRepository.create(owner);
 
     const team = new Team(teamId, name, owner.id, [owner.id]);
@@ -39,7 +41,7 @@ export class TeamUseCase {
     const currentUser = await this.sessionRepository.getUser();
     if (!currentUser) throw new UseCaseError("ログインしてください");
 
-    const target = new User(createId(), targetUserName, "Member", teamId);
+    const target = new User(createId(), targetUserName, "Member", teamId, false);
     await this.userRepository.create(target);
 
     const team = await this.teamRepository.get(teamId);
@@ -81,5 +83,27 @@ export class TeamUseCase {
     team.deleteTeam(currentUser);
 
     await this.teamRepository.delete(team);
+  }
+
+  async removeUser(teamId: string, userId: string) {
+    const currentUser = await this.sessionRepository.getUser();
+    if (!currentUser) throw new UseCaseError("ログインしてください");
+
+    const target = await this.userRepository.get(userId);
+    target.delete();
+
+    const team = await this.teamRepository.get(teamId);
+    team.removeUser(currentUser, target);
+
+    const channels = await this.channelRepository.getAllByUserId(teamId, userId);
+    channels.forEach((channel) => channel.removeUser(currentUser, target));
+
+    await Promise.all([
+      this.teamRepository.update(team),
+      this.channelRepository.updateAll(channels),
+      this.userRepository.delete(target),
+    ]);
+
+    return team;
   }
 }

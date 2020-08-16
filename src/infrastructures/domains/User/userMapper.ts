@@ -20,6 +20,7 @@ export const createUserMapper = ({
     teamId,
     createdAt: now,
     updatedAt: now,
+    deleted: false,
   };
 };
 

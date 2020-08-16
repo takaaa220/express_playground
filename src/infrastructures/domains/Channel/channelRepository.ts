@@ -7,6 +7,7 @@ import { createChannelMapper, updateChannelMapper } from "./channelMapper";
 import { Team } from "../../../domains/Team/team";
 import { InfrastructureError } from "../../helpers/error";
 import { ChannelStatus } from "../../../domains/Channel/status";
+import { User } from "../../../domains/User/user";
 
 type ChannelDB = {
   id: string;
@@ -38,6 +39,12 @@ export class ChannelRepository implements IChannelRepository {
         ),
       ),
     );
+  }
+
+  async getAllByUserId(teamId: Team["id"], userId: User["id"]) {
+    const teams = await this.getAllByTeamId(teamId);
+
+    return teams.filter((team) => team.userIds.includes(userId));
   }
 
   async get(channelId: Channel["id"]) {
@@ -86,6 +93,11 @@ export class ChannelRepository implements IChannelRepository {
         }),
       },
     );
+  }
+
+  async updateAll(channels: Channel[]) {
+    const updates = channels.map((channel) => this.update(channel));
+    await Promise.all(updates);
   }
 
   async delete(channel: Channel) {

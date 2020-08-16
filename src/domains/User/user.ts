@@ -12,7 +12,7 @@ export class User {
     name: string,
     private _role: UserRole,
     private _teamId: Team["id"] = "",
-    private _channelIds: Channel["id"][] = [],
+    private _deleted: boolean,
   ) {
     this._name = new UserName(name);
   }
@@ -49,6 +49,10 @@ export class User {
     return this.role === "Member";
   }
 
+  get deleted() {
+    return this._deleted;
+  }
+
   equals(target: User) {
     return this.id === target.id;
   }
@@ -73,5 +77,9 @@ export class User {
 
   belongsToTeam(teamId: string) {
     return teamId === this.teamId;
+  }
+
+  delete() {
+    this._deleted = true;
   }
 }

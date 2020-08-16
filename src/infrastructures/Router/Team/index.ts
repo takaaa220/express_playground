@@ -29,6 +29,12 @@ router.route("/:teamId").delete(async (req, res) => {
   res.json(response);
 });
 
+router.route("/:teamId/removeUser").post(async (req, res) => {
+  const response = await teamController.removeUser(req.params, req.body);
+
+  res.json(response);
+});
+
 router.route("/:teamId/invite").post(async (req, res) => {
   const response = await teamController.inviteUser(req.params, req.body);
 

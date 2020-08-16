@@ -5,6 +5,7 @@ import { TeamRepository } from "../../../infrastructures/domains/Team/teamReposi
 import { SessionRepository } from "../../../infrastructures/usecases/Session/sessionRepository";
 
 import { PresentationError } from "../../helpers/error";
+import { ChannelRepository } from "../../../infrastructures/domains/Channel/channelRepository";
 
 export class TeamController {
   private useCase: TeamUseCase;
@@ -15,6 +16,7 @@ export class TeamController {
       new TeamRepository(),
       userRepository,
       new SessionRepository(userRepository),
+      new ChannelRepository(),
     );
   }
 
@@ -63,6 +65,13 @@ export class TeamController {
     }
 
     await this.useCase.delete(params.teamId);
-    return;
+  }
+
+  async removeUser(params: { teamId?: string }, body: { userId: string }) {
+    if (params.teamId === undefined || body.userId === undefined) {
+      throw new PresentationError("リクエストが正しくありません");
+    }
+
+    return await this.useCase.removeUser(params.teamId, body.userId);
   }
 }
