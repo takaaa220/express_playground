@@ -17,6 +17,12 @@ router.post("/", async (req, res) => {
   res.json({ team });
 });
 
+router.delete("/:teamId", async (req, res) => {
+  await teamController.delete(req.params);
+
+  res.json({ status: "ok" });
+});
+
 router.post("/:teamId/invite", async (req, res) => {
   const team = await teamController.inviteUser(req.params, req.body);
 

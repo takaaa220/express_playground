@@ -42,4 +42,12 @@ export class TeamController {
 
     return this.useCase.changeOwner(params.teamId, params.newOwnerId);
   }
+
+  async delete(params: { teamId?: string }) {
+    if (params.teamId === undefined) {
+      throw new PresentationError("リクエストが正しくありません");
+    }
+
+    return this.useCase.delete(params.teamId);
+  }
 }

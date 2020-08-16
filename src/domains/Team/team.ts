@@ -7,6 +7,7 @@ export class Team {
   private _name: TeamName;
   private _ownerId: User["id"];
   private _userIds: User["id"][];
+  private _deleted: boolean = false;
 
   constructor(id: string, name: string, ownerId: User["id"], userIds: User["id"][] = []) {
     this._id = id;
@@ -39,6 +40,10 @@ export class Team {
     return this._userIds;
   }
 
+  get deleted() {
+    return this._deleted;
+  }
+
   invite(host: User, target: User) {
     if (!this.isOwner(host.id)) {
       throw new DomainError("チームへの招待はOwnerのみできます", "InvalidArgument");
@@ -59,6 +64,18 @@ export class Team {
       throw new DomainError("権限がおかしいんだよなぁ...");
 
     this._ownerId = newOwner.id;
+  }
+
+  deleteTeam(host: User) {
+    if (host.teamId !== this.id) {
+      throw new DomainError("別チームの削除はできません");
+    }
+
+    if (!host.isOwner) {
+      throw new DomainError("チームの削除はオーナーしかできません");
+    }
+
+    this._deleted = true;
   }
 
   private isOwner(targetId: User["id"]) {

@@ -102,6 +102,15 @@ export class TeamRepository implements ITeamRepository {
     }
   }
 
+  async delete(team: Team) {
+    if (!team.deleted) {
+      throw new InfrastructureError("チームの削除に失敗しました");
+    }
+
+    const db = await connectDb();
+    await this.collection(db).deleteOne({ id: team.id });
+  }
+
   private daoToTeam(dao: TeamDao) {
     return new Team(dao.id, dao.name, dao.ownerId, dao.userIds);
   }
