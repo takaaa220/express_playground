@@ -17,6 +17,12 @@ router.route("/").post(async (req, res) => {
   res.json(response);
 });
 
+router.route("/:teamId").put(async (req, res) => {
+  const response = await teamController.update(req.params, req.body);
+
+  res.json(response);
+});
+
 router.route("/:teamId").delete(async (req, res) => {
   const response = await teamController.delete(req.params);
 

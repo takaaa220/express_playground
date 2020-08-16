@@ -59,6 +59,18 @@ export class TeamUseCase {
     team.changeOwner(currentUser, newOwner);
     currentUser.downgradeToAdmin(team);
     newOwner.upgradeToOwner(team);
+
+    return this.teamRepository.update(team);
+  }
+
+  async update(teamId: string, attributes: { name: string }) {
+    const currentUser = await this.sessionRepository.getUser();
+    if (!currentUser) throw new UseCaseError("ログインしてください");
+
+    const team = await this.teamRepository.get(teamId);
+    team.updateAttributes(currentUser, { name: attributes.name });
+
+    return this.teamRepository.update(team);
   }
 
   async delete(teamId: string) {

@@ -23,19 +23,28 @@ export class TeamController {
     return { teams };
   }
 
-  async create(requestBody: {}) {
-    const form = new CreateTeamForm(requestBody);
+  async create(body: {}) {
+    const form = new CreateTeamForm(body);
 
     const team = await this.useCase.createTeam(form.name, form.ownerName);
     return { team };
   }
 
-  async inviteUser(params: { teamId?: string }, requestBody: { name?: string }) {
-    if (params.teamId === undefined || requestBody.name === undefined) {
+  async update(params: { teamId?: string }, body: { name?: string }) {
+    if (params.teamId === undefined || body.name === undefined) {
       throw new PresentationError("リクエストが正しくありません");
     }
 
-    const team = await this.useCase.inviteUser(params.teamId, requestBody.name);
+    const team = await this.useCase.update(params.teamId, { name: body.name });
+    return { team };
+  }
+
+  async inviteUser(params: { teamId?: string }, body: { name?: string }) {
+    if (params.teamId === undefined || body.name === undefined) {
+      throw new PresentationError("リクエストが正しくありません");
+    }
+
+    const team = await this.useCase.inviteUser(params.teamId, body.name);
     return { team };
   }
 

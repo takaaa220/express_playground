@@ -99,4 +99,16 @@ export class Team {
   private isExistedUser(targetId: User["id"]) {
     return this._userIds.includes(targetId);
   }
+
+  updateAttributes(host: User, attributes: { name: string }) {
+    if (!this.belongsTo(host)) {
+      throw new DomainError("別チームを操作する事はできません");
+    }
+
+    if (!host.isOwner) {
+      throw new DomainError("チーム情報の更新はオーナーだけができます");
+    }
+
+    this._name = new TeamName(attributes.name);
+  }
 }
