@@ -15,8 +15,12 @@ export type MessageDB = {
 };
 
 export class MessageRepository implements IMessageRepository {
-  getAll(channelId: string) {
-    return [];
+  async getAll(channelId: string) {
+    const db = await connectDb();
+
+    const dataList = await this.connection(db).find({ channelId }).toArray();
+
+    return dataList.map((data) => this.daoToMessage(new MessageDao(data)));
   }
 
   async get(id: string, channelId: string) {

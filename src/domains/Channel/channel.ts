@@ -169,6 +169,10 @@ export class Channel {
     return new Message(createId(), host.id, this.id, messageContent);
   }
 
+  hasMessageViewingAuthority(host: User) {
+    return host.isOwner || this.joined(host);
+  }
+
   private joined(user: User) {
     return this.userIds.includes(user.id);
   }

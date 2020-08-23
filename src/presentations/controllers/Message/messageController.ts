@@ -16,6 +16,15 @@ export class MessageController {
     );
   }
 
+  async getAll(params: { teamId?: string; channelId?: string }) {
+    if (params.teamId === undefined || params.channelId === undefined) {
+      throw new PresentationError("リクエストが正しくありません");
+    }
+
+    const messages = await this.useCase.getAll(params.channelId);
+    return { messages };
+  }
+
   async create(params: { teamId?: string; channelId?: string }, body: { message?: string }) {
     if (
       params.teamId === undefined ||
