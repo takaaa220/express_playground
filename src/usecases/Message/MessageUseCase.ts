@@ -4,7 +4,6 @@ import { IChannelRepository } from "../../domains/Channel/channelRepository";
 
 import { Message } from "../../domains/Message/message";
 import { UseCaseError } from "../helpers/error";
-import { DomainError } from "../../domains/helpers/error";
 
 export class MessageUseCase {
   constructor(

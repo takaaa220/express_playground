@@ -166,11 +166,15 @@ export class Channel {
       throw new DomainError("所属していないチャンネルでメッセージを送信することはできません");
     }
 
+    if (host.deleted) {
+      throw new DomainError("削除済みのユーザはメッセージを送信する事ができません");
+    }
+
     return new Message(createId(), host.id, this.id, messageContent);
   }
 
   hasMessageViewingAuthority(host: User) {
-    return host.isOwner || this.joined(host);
+    return host.belongsToTeam(this.teamId) && !host.deleted && (host.isOwner || this.joined(host));
   }
 
   private joined(user: User) {
