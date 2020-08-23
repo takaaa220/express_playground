@@ -4,6 +4,7 @@ import { MessageRepository } from "../../../infrastructures/domains/Message/mess
 import { ChannelRepository } from "../../../infrastructures/domains/Channel/channelRepository";
 import { UserRepository } from "../../../infrastructures/domains/User/userRepository";
 import { PresentationError } from "../../helpers/error";
+import { Message } from "../../../domains/Message/message";
 
 export class MessageController {
   private useCase: MessageUseCase;
@@ -22,7 +23,7 @@ export class MessageController {
     }
 
     const messages = await this.useCase.getAll(params.channelId);
-    return { messages };
+    return { messages: messages.map((m) => this.serialize(m)) };
   }
 
   async create(params: { teamId?: string; channelId?: string }, body: { message?: string }) {
@@ -35,6 +36,14 @@ export class MessageController {
     }
 
     const message = await this.useCase.create(params.channelId, body.message);
-    return { message };
+    return { message: this.serialize(message) };
+  }
+
+  private serialize(message: Message) {
+    return {
+      id: message.id,
+      content: message.content,
+      userId: message.userId,
+    };
   }
 }

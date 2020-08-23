@@ -5,6 +5,7 @@ import { SessionRepository } from "../../../infrastructures/usecases/Session/ses
 import { PresentationError } from "../../helpers/error";
 import { ChannelUseCase } from "../../../usecases/Channel/ChannelUseCase";
 import { ChannelRepository } from "../../../infrastructures/domains/Channel/channelRepository";
+import { Channel } from "../../../domains/Channel/channel";
 
 export class ChannelController {
   private useCase: ChannelUseCase;
@@ -25,7 +26,7 @@ export class ChannelController {
     }
 
     const channels = await this.useCase.getAll(params.teamId);
-    return { channels };
+    return { channels: channels.map((c) => this.serialize(c)) };
   }
 
   async create(params: { teamId?: string }, body: { channelName?: string; isPrivate?: boolean }) {
@@ -41,7 +42,7 @@ export class ChannelController {
       channelName: body.channelName,
       isPrivate: body.isPrivate,
     });
-    return { channel };
+    return { channel: this.serialize(channel) };
   }
 
   async update(params: { teamId?: string; channelId?: string }, body: { name?: string }) {
@@ -50,7 +51,7 @@ export class ChannelController {
     }
 
     const channel = await this.useCase.update(params.channelId, body.name);
-    return { channel };
+    return { channel: this.serialize(channel) };
   }
 
   async changeStatus(
@@ -66,7 +67,7 @@ export class ChannelController {
     }
 
     const channel = await this.useCase.changeStatus(params.channelId, body.isPrivate);
-    return { channel };
+    return { channel: this.serialize(channel) };
   }
 
   async delete(params: { teamId?: string; channelId?: string }) {
@@ -84,7 +85,7 @@ export class ChannelController {
     }
 
     const channel = await this.useCase.join(params.channelId);
-    return { channel };
+    return { channel: this.serialize(channel) };
   }
 
   async leave(params: { teamId?: string; channelId?: string }) {
@@ -93,7 +94,7 @@ export class ChannelController {
     }
 
     const channel = await this.useCase.leave(params.channelId);
-    return { channel };
+    return { channel: this.serialize(channel) };
   }
 
   async invite(params: { teamId?: string; channelId?: string }, body: { userId?: string }) {
@@ -106,7 +107,7 @@ export class ChannelController {
     }
 
     const channel = await this.useCase.inviteUser(params.channelId, body.userId);
-    return { channel };
+    return { channel: this.serialize(channel) };
   }
 
   async removeUser(params: { teamId?: string; channelId?: string }, body: { userId?: string }) {
@@ -119,6 +120,14 @@ export class ChannelController {
     }
 
     const channel = await this.useCase.removeUser(params.channelId, body.userId);
-    return { channel };
+    return { channel: this.serialize(channel) };
+  }
+
+  private serialize(channel: Channel) {
+    return {
+      id: channel.id,
+      name: channel.name,
+      status: channel.status,
+    };
   }
 }

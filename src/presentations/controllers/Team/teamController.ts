@@ -6,6 +6,7 @@ import { SessionRepository } from "../../../infrastructures/usecases/Session/ses
 
 import { PresentationError } from "../../helpers/error";
 import { ChannelRepository } from "../../../infrastructures/domains/Channel/channelRepository";
+import { Team } from "../../../domains/Team/team";
 
 export class TeamController {
   private useCase: TeamUseCase;
@@ -22,14 +23,14 @@ export class TeamController {
 
   async getAll() {
     const teams = await this.useCase.getAllTeams();
-    return { teams };
+    return { teams: teams.map((t) => this.serialize(t)) };
   }
 
   async create(body: {}) {
     const form = new CreateTeamForm(body);
 
     const team = await this.useCase.createTeam(form.name, form.ownerName);
-    return { team };
+    return { team: this.serialize(team) };
   }
 
   async update(params: { teamId?: string }, body: { name?: string }) {
@@ -38,7 +39,7 @@ export class TeamController {
     }
 
     const team = await this.useCase.update(params.teamId, { name: body.name });
-    return { team };
+    return { team: this.serialize(team) };
   }
 
   async inviteUser(params: { teamId?: string }, body: { name?: string }) {
@@ -47,7 +48,7 @@ export class TeamController {
     }
 
     const team = await this.useCase.inviteUser(params.teamId, body.name);
-    return { team };
+    return { team: this.serialize(team) };
   }
 
   async changeOwner(params: { teamId?: string; newOwnerId?: string }) {
@@ -56,7 +57,7 @@ export class TeamController {
     }
 
     const team = await this.useCase.changeOwner(params.teamId, params.newOwnerId);
-    return { team };
+    return { team: this.serialize(team) };
   }
 
   async delete(params: { teamId?: string }) {
@@ -72,6 +73,17 @@ export class TeamController {
       throw new PresentationError("リクエストが正しくありません");
     }
 
-    return await this.useCase.removeUser(params.teamId, body.userId);
+    const team = await this.useCase.removeUser(params.teamId, body.userId);
+    return this.serialize(team);
+  }
+
+  private serialize(team: Team) {
+    return {
+      id: team.id,
+      name: team.name,
+      deleted: team.deleted,
+      ownerId: team.ownerId,
+      userIds: team.userIds,
+    };
   }
 }
