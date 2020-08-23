@@ -1,11 +1,14 @@
 import { MessageContent } from "./content";
 
 export class Message {
-  private _id: string;
   private _content: MessageContent;
 
-  constructor(id: string, content: string) {
-    this._id = id;
+  constructor(
+    private _id: string,
+    private _userId: string,
+    private _channelId: string,
+    content: string,
+  ) {
     this._content = new MessageContent(content);
   }
 
@@ -15,5 +18,13 @@ export class Message {
 
   get content() {
     return this._content.value;
+  }
+
+  get userId() {
+    return this._userId;
+  }
+
+  get channelId() {
+    return this._channelId;
   }
 }

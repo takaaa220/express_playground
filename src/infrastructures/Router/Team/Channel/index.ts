@@ -1,5 +1,6 @@
 import express from "express";
-import { ChannelController } from "../../../../presentations/controllers/Team/channelController";
+import { ChannelController } from "../../../../presentations/controllers/Channel/channelController";
+import MessageRouter from "./Message";
 
 const router = express.Router({ mergeParams: true });
 
@@ -58,5 +59,7 @@ router.route("/:channelId/removeUser").delete(async (req, res) => {
 
   res.json(response);
 });
+
+router.use("/:channelId/message", MessageRouter);
 
 export default router;

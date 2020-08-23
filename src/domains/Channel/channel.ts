@@ -3,6 +3,8 @@ import { User } from "../User/user";
 import { Team } from "../Team/team";
 import { DomainError } from "../helpers/error";
 import { ChannelStatus } from "./status";
+import { Message } from "../Message/message";
+import { createId } from "../../helpers/createId";
 
 export class Channel {
   private _name: ChannelName;
@@ -159,12 +161,20 @@ export class Channel {
     this._status = isPrivate ? "private" : "public";
   }
 
-  private hasAuthority(host: User) {
-    return !(host.isMember || (host.isAdmin && host.id !== this.ownerId));
+  createMessage(host: User, messageContent: string) {
+    if (!this.joined(host)) {
+      throw new DomainError("所属していないチャンネルでメッセージを送信することはできません");
+    }
+
+    return new Message(createId(), host.id, this.id, messageContent);
   }
 
   private joined(user: User) {
     return this.userIds.includes(user.id);
+  }
+
+  private hasAuthority(host: User) {
+    return !(host.isMember || (host.isAdmin && host.id !== this.ownerId));
   }
 
   private addUser(user: User) {

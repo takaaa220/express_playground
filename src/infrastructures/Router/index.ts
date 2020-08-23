@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
 import TeamRouter from "./Team";
 import ChannelRouter from "./Team/Channel";
+import MessageRouter from "./Team/Channel/Message";
 
 const router = express();
 router.use(bodyParser.urlencoded({ extended: true }));
